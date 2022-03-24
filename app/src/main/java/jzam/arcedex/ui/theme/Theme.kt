@@ -7,29 +7,30 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-//TODO Actually support dark mode with different color set
 private val DarkColorPalette = darkColors(
-    primary = Burgundy,
-    primaryVariant = DarkBurgundy,
-    secondary = NavyBlue,
-    secondaryVariant = Color.Yellow,
-    background = Linen,
+    primary = DarkBurgundy,
+    primaryVariant = DarkYellow,
+    secondary = DarkNavyBlue,
+    secondaryVariant = DarkYellow,
+    background = DarkGray,
+    surface = DarkBurgundy,
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onSurface = Color.White
 )
 
 private val LightColorPalette = lightColors(
     primary = Burgundy,
-    primaryVariant = DarkBurgundy,
+    primaryVariant = Color.Yellow,
     secondary = NavyBlue,
-    secondaryVariant = Color.Yellow,
+    secondaryVariant = NavyBlue,
     background = Linen,
 )
 
 @Composable
 fun ArcedexTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     val colors = if (darkTheme) {
-        //TODO Dark mode not supported yet
-        LightColorPalette
-        //DarkColorPalette
+        DarkColorPalette
     } else {
         LightColorPalette
     }

@@ -1,19 +1,18 @@
 <resources>
     <string name="app_name">Arcedex</string>
-    <string name="next_rank_text">Points to next rank: </string>
     <string name="sort_label">SORT</string>
     <string name="hisui_sort_label">Hisui</string>
     <string name="national_sort_label">National</string>
     <string name="alpha_sort_label">Alphabetical</string>
-    <string name="pokemon_pic_desc">Pokemon pic</string>
-    <string name="pokeball_pic_desc">Pokeball pic</string>
-    <string name="red_quote">...</string>
+    <string name="pokemon_pic_desc" translatable="false">Pokemon pic</string>
+    <string name="pokeball_pic_desc" translatable="false">Pokeball pic</string>
+    <string name="red_quote" translatable="false">...</string>
     <string name="search_fail_message">Nothing to see here. Clear search and try again.</string>
-    <string name="points_icon_desc">Points icon</string>
+    <string name="points_icon_desc" translatable="false">Points icon</string>
     <string name="clear_label">CLEAR</string>
     <string name="search_label">Search</string>
     <string name="done_label">DONE</string>
-    <string name="waiting_pic_desc">Waiting pic</string>
-    <string name="init_message1">Initializing Arcedex...</string>
+    <string name="waiting_pic_desc" translatable="false">Waiting pic</string>
+    <string name="init_message1">Initializing Arcedex…</string>
     <string name="init_message2">Don\'t turn off the power.</string>
 </resources>

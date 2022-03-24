@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -25,12 +26,10 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import jzam.arcedex.models.PokeResearch
-import jzam.arcedex.models.PokeSort
-import jzam.arcedex.models.Pokemon
-import jzam.arcedex.models.ResearchProgress
+import jzam.arcedex.models.*
 import jzam.arcedex.ui.theme.ArcedexTheme
 import jzam.arcedex.ui.theme.Typography
 import jzam.arcedex.utils.*
@@ -74,7 +73,9 @@ fun ArcedexApp(pokeResearchViewModel: PokeResearchViewModel) {
     val searchedText by pokeResearchViewModel.searchedText.observeAsState()
     val userPoints by pokeResearchViewModel.userPoints.observeAsState()
     val pokemonToResearchTasks by pokeResearchViewModel.pokemonToResearchTasks.observeAsState()
+    val language = getSupportedLanguage(LocaleList.current)
 
+    pokeResearchViewModel.setLanguage(language)
 
     //Recalculate progress on recomposition, need to make sure research tasks has been fetched
     //before running or this will fail
@@ -90,12 +91,14 @@ fun ArcedexApp(pokeResearchViewModel: PokeResearchViewModel) {
         Scaffold(
             topBar = {
                 ArcedexTopBar(
+                    language = language,
                     userPoints = userPoints!!,
                     onSortChosen = pokeResearchViewModel::setSort
                 )
             },
             bottomBar = {
                 ArcedexBottomBar(
+                    language = language,
                     inSearchMode = inSearchMode!!,
                     searchText = searchedText!!,
                     onSearch = pokeResearchViewModel::searchPokedex,
@@ -105,6 +108,7 @@ fun ArcedexApp(pokeResearchViewModel: PokeResearchViewModel) {
         ) { innerPadding ->
             Box(modifier = Modifier.padding(innerPadding)) {
                 Pokedex(
+                    language = language,
                     pokedex = pokedex!!,
                     progress = researchProgress!!,
                     pokeSort = pokeSort!!,
@@ -118,11 +122,11 @@ fun ArcedexApp(pokeResearchViewModel: PokeResearchViewModel) {
 
 //App's top bar - Shows app name, research rank progress, and Sort button
 @Composable
-fun ArcedexTopBar(userPoints: Int, onSortChosen: (PokeSort) -> Unit) {
+fun ArcedexTopBar(language: SupportedLanguage, userPoints: Int, onSortChosen: (PokeSort) -> Unit) {
     TopAppBar(
         title = { Text(stringResource(R.string.app_name)) },
         actions = {
-            ResearchRankInfo(userPoints)
+            ResearchRankInfo(language, userPoints)
             SortButton(onSortChosen)
         }
     )
@@ -130,9 +134,9 @@ fun ArcedexTopBar(userPoints: Int, onSortChosen: (PokeSort) -> Unit) {
 
 //Display current research rank, progress bar to next rank, and points to next rank
 @Composable
-fun ResearchRankInfo(userPoints: Int) {
-    val researchRank = getResearchRank(userPoints)
-    val pointsToNext = getPointsToNextRankText(userPoints)
+fun ResearchRankInfo(language: SupportedLanguage, userPoints: Int) {
+    val researchRank = getResearchRank(language, userPoints)
+    val pointsToNext = getPointsToNextRankText(language, userPoints)
     val barProgress = getRankProgress(userPoints.toFloat())
 
     Column {
@@ -141,8 +145,8 @@ fun ResearchRankInfo(userPoints: Int) {
             progress = barProgress,
             color = MaterialTheme.colors.onPrimary,
             modifier = Modifier
-                .width(150.dp)
-                .padding(8.dp)
+                .width(130.dp)
+                .padding(vertical = 8.dp)
         )
         Text(pointsToNext, style = Typography.caption)
     }
@@ -188,6 +192,7 @@ fun SortButton(onSortChosen: (PokeSort) -> Unit) {
 //Pokedex screen - list Pokemon and click a Pokemon to expand and see their research tasks
 @Composable
 fun Pokedex(
+    language: SupportedLanguage,
     pokedex: List<Pokemon>, progress: List<ResearchProgress>,
     pokeSort: PokeSort, onGoalClick: (PokeResearch, Int) -> Unit,
     pokemonToResearchTasks: Map<String, MutableList<PokeResearch>>?
@@ -196,6 +201,7 @@ fun Pokedex(
         LazyColumn {
             items(pokedex) {
                 PokedexPokemon(
+                    language = language,
                     pokemon = it,
                     tasks = pokemonToResearchTasks?.get(it.name),
                     progress = progress,
@@ -212,8 +218,12 @@ fun Pokedex(
 //Display for a Pokemon from the Pokedex screen
 @Composable
 fun PokedexPokemon(
-    pokemon: Pokemon, tasks: MutableList<PokeResearch>?, progress: List<ResearchProgress>,
-    pokeSort: PokeSort, onGoalClick: (PokeResearch, Int) -> Unit
+    language: SupportedLanguage,
+    pokemon: Pokemon,
+    tasks: MutableList<PokeResearch>?,
+    progress: List<ResearchProgress>,
+    pokeSort: PokeSort,
+    onGoalClick: (PokeResearch, Int) -> Unit
 ) {
 
     var isExpanded by remember { mutableStateOf(false) }
@@ -224,6 +234,7 @@ fun PokedexPokemon(
     ) {
         Column {
             PokemonHeaderRow(
+                language = language,
                 pokemon = pokemon,
                 progress = progress,
                 pokeSort = pokeSort,
@@ -232,7 +243,7 @@ fun PokedexPokemon(
             if (isExpanded) {
                 if (tasks != null) {
                     for (item in tasks) {
-                        TaskRow(item, onGoalClick)
+                        TaskRow(language, item, onGoalClick)
                     }
                 }
             }
@@ -243,27 +254,45 @@ fun PokedexPokemon(
 //Header row that displays info about Pokemon and a summary of its research progress.
 @Composable
 fun PokemonHeaderRow(
+    language: SupportedLanguage,
     pokemon: Pokemon, progress: List<ResearchProgress>, pokeSort: PokeSort, isExpanded: Boolean,
     onClick: () -> Unit
 ) {
     val pokeProgress = progress.find { it.name == pokemon.name }
     val bgColor: Color
-
-    if (isExpanded) {
-        bgColor = MaterialTheme.colors.secondaryVariant
-    } else {
-        bgColor = MaterialTheme.colors.background
-    }
+    val alpha: Float
 
     if (pokeProgress != null) {
+        if (pokeProgress.pointsDone == 0) {
+            alpha = .2f
+        } else {
+            alpha = 1f
+        }
+        bgColor = when {
+            isExpanded -> {
+                MaterialTheme.colors.primaryVariant
+            }
+            pokeProgress.pointsDone == 0 -> {
+                Color.Gray
+            }
+            else -> {
+                MaterialTheme.colors.background
+            }
+        }
+
         Row(modifier = Modifier
             .background(MaterialTheme.colors.secondary)
             .fillMaxWidth()
             .clickable { onClick() }) {
             PokemonImage(
-                pokemon.imgId, 50, stringResource(id = R.string.pokemon_pic_desc), bgColor
+                imgId = pokemon.imgId,
+                size = 50,
+                desc = stringResource(id = R.string.pokemon_pic_desc),
+                color = bgColor,
+                alpha = alpha
             )
             PokemonProgress(
+                language = language,
                 modifier = Modifier.weight(1f),
                 pokemon = pokemon,
                 pokeProgress = pokeProgress,
@@ -276,7 +305,7 @@ fun PokemonHeaderRow(
 
 //Generic image format for this screen
 @Composable
-fun PokemonImage(imgId: Int, size: Int, desc: String, color: Color) {
+fun PokemonImage(imgId: Int, size: Int, desc: String, color: Color, alpha: Float) {
     Image(
         painter = painterResource(id = imgId),
         contentDescription = desc,
@@ -285,12 +314,14 @@ fun PokemonImage(imgId: Int, size: Int, desc: String, color: Color) {
             .clip(RectangleShape)
             .border(1.5.dp, MaterialTheme.colors.secondary, RectangleShape)
             .background(color)
+            .alpha(alpha)
     )
 }
 
 //Display Pokemon's basic info and research progress summary
 @Composable
 fun PokemonProgress(
+    language: SupportedLanguage,
     modifier: Modifier, pokemon: Pokemon, pokeProgress: ResearchProgress,
     pokeSort: PokeSort
 ) {
@@ -308,12 +339,13 @@ fun PokemonProgress(
                 )
             }
             Text(
-                pokemon.name, color = MaterialTheme.colors.onPrimary,
+                translate(language, pokemon.name), color = MaterialTheme.colors.onPrimary,
                 modifier = Modifier.padding(horizontal = 8.dp)
             )
         }
         Text(
             formatPokemonResearchInfo(
+                lang = language,
                 goalsDone = pokeProgress.goalsDone,
                 goalsTotal = pokeProgress.goalsTotal,
                 pointsDone = pokeProgress.pointsDone + pokeProgress.bonusEarned,
@@ -338,14 +370,19 @@ fun ProgressPokeballImage(pokeProgress: ResearchProgress) {
         PokemonImage(
             imgId = pokeballImg, size = 50,
             desc = stringResource(R.string.pokeball_pic_desc),
-            color = MaterialTheme.colors.background
+            color = MaterialTheme.colors.background,
+            alpha = 1f
         )
     }
 }
 
 //Show a research task with points icon, description, and clickable progress goals
 @Composable
-fun TaskRow(pokemonTask: PokeResearch, onGoalClick: (PokeResearch, Int) -> Unit) {
+fun TaskRow(
+    language: SupportedLanguage,
+    pokemonTask: PokeResearch,
+    onGoalClick: (PokeResearch, Int) -> Unit
+) {
 
     Row(
         modifier = Modifier
@@ -354,15 +391,46 @@ fun TaskRow(pokemonTask: PokeResearch, onGoalClick: (PokeResearch, Int) -> Unit)
     ) {
         PointsIcon(points = pokemonTask.points)
         Text(
-            pokemonTask.task, modifier = Modifier
+            //pokemonTask.task, modifier = Modifier
+            translate(language, pokemonTask.task), modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 8.dp)
         )
-        GoalText(goal = pokemonTask.goal1, goalNum = 1, pokemonTask, onGoalClick)
-        GoalText(goal = pokemonTask.goal2, goalNum = 2, pokemonTask, onGoalClick)
-        GoalText(goal = pokemonTask.goal3, goalNum = 3, pokemonTask, onGoalClick)
-        GoalText(goal = pokemonTask.goal4, goalNum = 4, pokemonTask, onGoalClick)
-        GoalText(goal = pokemonTask.goal5, goalNum = 5, pokemonTask, onGoalClick)
+        GoalText(
+            language = language,
+            goal = pokemonTask.goal1,
+            goalNum = 1,
+            pokemonTask,
+            onGoalClick
+        )
+        GoalText(
+            language = language,
+            goal = pokemonTask.goal2,
+            goalNum = 2,
+            pokemonTask,
+            onGoalClick
+        )
+        GoalText(
+            language = language,
+            goal = pokemonTask.goal3,
+            goalNum = 3,
+            pokemonTask,
+            onGoalClick
+        )
+        GoalText(
+            language = language,
+            goal = pokemonTask.goal4,
+            goalNum = 4,
+            pokemonTask,
+            onGoalClick
+        )
+        GoalText(
+            language = language,
+            goal = pokemonTask.goal5,
+            goalNum = 5,
+            pokemonTask,
+            onGoalClick
+        )
     }
 }
 
@@ -377,27 +445,28 @@ fun PointsIcon(points: Int) {
     }
     PokemonImage(
         imgId = R.drawable.double_points, size = 25,
-        desc = stringResource(id = R.string.points_icon_desc), color = color
+        desc = stringResource(id = R.string.points_icon_desc), color = color, alpha = 1f
     )
 }
 
 //Goal description that can clicked to modify goal progress for a research task
 @Composable
 fun GoalText(
+    language: SupportedLanguage,
     goal: String, goalNum: Int, pokemonTask: PokeResearch,
     onGoalClick: (PokeResearch, Int) -> Unit
 ) {
     var backgroundColor = MaterialTheme.colors.background
 
-    if (pokemonTask.goalProgress >= goalNum) backgroundColor = MaterialTheme.colors.secondaryVariant
+    if (pokemonTask.goalProgress >= goalNum) backgroundColor = MaterialTheme.colors.primaryVariant
     if (goal.isNotBlank()) {
         Card(
             modifier = Modifier
-                .border(1.dp, MaterialTheme.colors.secondary)
+                .border(1.dp, MaterialTheme.colors.secondaryVariant)
                 .clickable { onGoalClick(pokemonTask, goalNum) }
         ) {
             Text(
-                goal, modifier = Modifier
+                translate(lang = language, text = goal), modifier = Modifier
                     .background(backgroundColor)
                     .padding(all = 8.dp)
             )
@@ -410,10 +479,21 @@ fun GoalText(
 fun ShowEmptySearch() {
     val emptyPokemon = jzam.arcedex.data.Pokedex.emptyDex
     val emptyResearch =
-        listOf(ResearchProgress(name = emptyPokemon.name, goalsTotal = 0, pointsTotal = 0))
+        listOf(
+            ResearchProgress(
+                name = emptyPokemon.name,
+                goalsTotal = 0,
+                pointsTotal = 1,
+                pointsDone = 1
+            )
+        )
     Column(Modifier.padding(8.dp)) {
-        PokemonHeaderRow(pokemon = emptyPokemon, progress = emptyResearch,
-            pokeSort = PokeSort.HISUI, isExpanded = false, onClick = {})
+        PokemonHeaderRow(language = SupportedLanguage.ENGLISH,
+            pokemon = emptyPokemon,
+            progress = emptyResearch,
+            pokeSort = PokeSort.HISUI,
+            isExpanded = false,
+            onClick = {})
         Text(text = stringResource(R.string.red_quote), fontSize = 50.sp)
         Text(text = stringResource(R.string.red_quote), fontSize = 50.sp)
         Text(text = stringResource(R.string.search_fail_message))
@@ -423,6 +503,7 @@ fun ShowEmptySearch() {
 //App's bottom bar - used for searching the Pokemon list
 @Composable
 fun ArcedexBottomBar(
+    language: SupportedLanguage,
     inSearchMode: Boolean, searchText: String, onSearch: (String) -> Unit,
     searchClear: () -> Unit
 ) {
@@ -434,7 +515,8 @@ fun ArcedexBottomBar(
                     .padding(horizontal = 4.dp)
             ) {
                 Text(
-                    formatSearchedText(searchText), color = MaterialTheme.colors.onPrimary,
+                    formatSearchedText(language, searchText),
+                    color = MaterialTheme.colors.onPrimary,
                     modifier = Modifier
                         .background(MaterialTheme.colors.primary)
                         .padding(all = 4.dp)
@@ -473,8 +555,11 @@ fun RowScope.SearchInputText(
         value = text,
         onValueChange = { text = it },
         colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = Color.White,
-            textColor = Color.Black
+            backgroundColor = MaterialTheme.colors.background,
+            textColor = MaterialTheme.colors.onBackground,
+            placeholderColor = MaterialTheme.colors.onBackground,
+            focusedLabelColor = MaterialTheme.colors.onBackground,
+            cursorColor = MaterialTheme.colors.onBackground
         ),
         maxLines = 1,
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
@@ -507,13 +592,26 @@ fun RowScope.SearchInputText(
 //screen when I get a chance.
 @Composable
 fun InitializationScreen() {
-    Column(Modifier.padding(8.dp)) {
+    Column(
+        Modifier
+            .padding(8.dp)
+            .background(MaterialTheme.colors.background)
+            .fillMaxSize(1f)) {
         PokemonImage(
             imgId = R.drawable.sprite79, size = 200,
             desc = stringResource(id = R.string.waiting_pic_desc),
-            color = MaterialTheme.colors.background
+            color = MaterialTheme.colors.background,
+            alpha = 1f
         )
-        Text(stringResource(R.string.init_message1), style = Typography.h5)
-        Text(stringResource(R.string.init_message2), style = Typography.h6)
+        Text(
+            stringResource(R.string.init_message1),
+            style = Typography.h5,
+            color = MaterialTheme.colors.onBackground
+        )
+        Text(
+            stringResource(R.string.init_message2),
+            style = Typography.h6,
+            color = MaterialTheme.colors.onBackground
+        )
     }
 }

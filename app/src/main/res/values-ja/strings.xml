@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">アルクデクス</string>
+    <string name="done_label">表示</string>
+    <string name="search_label">検索</string>
+    <string name="clear_label">消去</string>
+    <string name="init_message1">アルクデクスの初期化</string>
+    <string name="init_message2">お待ちください</string>
+    <string name="search_fail_message">見つかりません.</string>
+    <string name="hisui_sort_label">ヒスイ</string>
+    <string name="national_sort_label">全国</string>
+    <string name="alpha_sort_label">五十音順</string>
+    <string name="sort_label">ソート</string>
+</resources>

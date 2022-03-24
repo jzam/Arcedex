@@ -1,6 +1,9 @@
 package jzam.arcedex.utils
 
+import androidx.compose.ui.text.intl.LocaleList
 import jzam.arcedex.data.PokeResearchData
+import jzam.arcedex.data.PokeTranslateData
+import jzam.arcedex.models.SupportedLanguage
 
 /*
  * General utility methods for the app
@@ -20,34 +23,37 @@ fun formatPokemonId(id: Int): String {
 }
 
 fun formatPokemonResearchInfo(
+    lang: SupportedLanguage,
     goalsDone: Int, goalsTotal: Int, pointsDone: Int,
     pointsTotal: Int
 ): String {
-    return ("Tasks: $goalsDone / $goalsTotal | Points: $pointsDone / $pointsTotal")
+    return (translate(lang, "Tasks") + ": $goalsDone/$goalsTotal | " +
+            translate(lang, "Points") + ": $pointsDone/$pointsTotal")
 }
 
-fun formatSearchedText(searchText: String): String {
-    return "Searched for $searchText"
+fun formatSearchedText(lang: SupportedLanguage, searchText: String): String {
+    return translate(lang, "Searched for") + " $searchText"
 }
 
-fun getResearchRank(points: Int): String {
+fun getResearchRank(lang: SupportedLanguage, points: Int): String {
     val ranks = PokeResearchData.ranks
-    return when {
-        points < ranks[1] -> "Research Rank 0"
-        points < ranks[2] -> "Research Rank 1"
-        points < ranks[3] -> "Research Rank 2"
-        points < ranks[4] -> "Research Rank 3"
-        points < ranks[5] -> "Research Rank 4"
-        points < ranks[6] -> "Research Rank 5"
-        points < ranks[7] -> "Research Rank 6"
-        points < ranks[8] -> "Research Rank 7"
-        points < ranks[9] -> "Research Rank 8"
-        points < ranks[10] -> "Research Rank 9"
-        else -> "Research Rank 10"
+    val rank = when {
+        points < ranks[1] -> "0"
+        points < ranks[2] -> "1"
+        points < ranks[3] -> "2"
+        points < ranks[4] -> "3"
+        points < ranks[5] -> "4"
+        points < ranks[6] -> "5"
+        points < ranks[7] -> "6"
+        points < ranks[8] -> "7"
+        points < ranks[9] -> "8"
+        points < ranks[10] -> "9"
+        else -> "10"
     }
+    return translate(lang, "Research Rank") + " " + rank
 }
 
-fun getPointsToNextRankText(points: Int): String {
+fun getPointsToNextRankText(lang: SupportedLanguage, points: Int): String {
     val ranks = PokeResearchData.ranks
     val pointsNeeded = when {
         points < ranks[1] -> ranks[1] - points
@@ -62,7 +68,7 @@ fun getPointsToNextRankText(points: Int): String {
         points < ranks[10] -> ranks[10] - points
         else -> 0
     }
-    return "Points to next rank: $pointsNeeded"
+    return translate(lang, "Points to next rank:") + " " + pointsNeeded
 }
 
 fun getRankProgress(points: Float): Float {
@@ -80,4 +86,29 @@ fun getRankProgress(points: Float): Float {
         points < ranks[10] -> ((points - ranks[9]) / (ranks[10] - ranks[9]))
         else -> 1f
     }
+}
+
+fun translate(lang: SupportedLanguage, text: String): String {
+
+    val translation = when (lang) {
+        SupportedLanguage.JAPANESE -> PokeTranslateData.jp.find { it.oldText == text }
+        else -> null
+    }
+    if (translation != null) {
+        return translation.newText
+    } else {
+        return text
+    }
+}
+
+fun getSupportedLanguage(locales: LocaleList): SupportedLanguage {
+    for (locale in locales) {
+        if (PokeTranslateData.languages.contains(locale.language)) {
+            return when (locale.language) {
+                "ja" -> SupportedLanguage.JAPANESE
+                else -> SupportedLanguage.ENGLISH
+            }
+        }
+    }
+    return SupportedLanguage.ENGLISH
 }

@@ -3,10 +3,8 @@ package jzam.arcedex.viewmodels
 import androidx.lifecycle.*
 import jzam.arcedex.data.PokeResearchRepository
 import jzam.arcedex.data.Pokedex
-import jzam.arcedex.models.PokeResearch
-import jzam.arcedex.models.PokeSort
-import jzam.arcedex.models.Pokemon
-import jzam.arcedex.models.ResearchProgress
+import jzam.arcedex.models.*
+import jzam.arcedex.utils.translate
 import kotlinx.coroutines.launch
 
 /*
@@ -50,6 +48,8 @@ class PokeResearchViewModel(
         MutableLiveData()
     var pokemonToResearchTasks: LiveData<Map<String, MutableList<PokeResearch>>> =
         _pokemonToResearchTasks
+
+    private var language = SupportedLanguage.ENGLISH
 
     //Set initial values on ViewModel initialization
     init {
@@ -122,7 +122,7 @@ class PokeResearchViewModel(
 
         when (sort) {
             PokeSort.ALPHABETICAL -> {
-                _pokedex.value = pokedex.value?.sortedBy { it.name }
+                _pokedex.value = pokedex.value?.sortedBy { translate(language, it.name) }
             }
             PokeSort.NATIONAL -> {
                 _pokedex.value = pokedex.value?.sortedBy { it.natId }
@@ -141,11 +141,16 @@ class PokeResearchViewModel(
         val nameToListIdx: MutableMap<String, Int> = mutableMapOf()
         val taskList = researchTasks.value
         val oldPokedex = pokedex.value
+        var translatedName: String
+        var translatedTask: String
+        val findText = translate(language, searchText).lowercase()
         if (taskList != null && oldPokedex != null) {
             for (task in taskList) {
+                translatedName = translate(language, task.name).lowercase()
+                translatedTask = translate(language, task.task).lowercase()
                 if (!nameToListIdx.containsKey(task.name) &&
-                    (task.name.lowercase().contains(searchText.lowercase()) ||
-                            task.task.lowercase().contains(searchText.lowercase()))
+                    (translatedName.contains(findText) ||
+                            translatedTask.contains(findText))
                 ) {
                     for (pokemon in oldPokedex) {
                         if (pokemon.name == task.name) {
@@ -169,7 +174,7 @@ class PokeResearchViewModel(
 
         when (_pokesort.value) {
             PokeSort.ALPHABETICAL -> {
-                _pokedex.value = Pokedex.pokedex.sortedBy { it.name }
+                _pokedex.value = Pokedex.pokedex.sortedBy { translate(language, it.name) }
             }
             PokeSort.NATIONAL -> {
                 _pokedex.value = Pokedex.pokedex.sortedBy { it.natId }
@@ -196,6 +201,10 @@ class PokeResearchViewModel(
             repository.delete(task)
             repository.insert(savTask)
         }
+    }
+
+    fun setLanguage(lang: SupportedLanguage) {
+        language = lang
     }
 }
 
