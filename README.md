@@ -17,28 +17,32 @@ Those were the main features I wanted, but I also planned and implemented other 
 ## App Screenshots
 Example Screenshot 1:
 
-<img src="https://user-images.githubusercontent.com/14002654/159147539-ef6c70af-f781-499a-b4ce-b74d3ce3c02d.jpg" width="250">
+<img src="https://user-images.githubusercontent.com/14002654/160038783-cd47687b-5228-47ec-9fa3-86f4c0e0e4b8.jpg" width="250">
 
 Example Screenshot 2:
 
-<img src="https://user-images.githubusercontent.com/14002654/159149284-baa7ea4e-dc18-48b9-bd24-d7f0605dba3f.jpg" width="250">
+<img src="https://user-images.githubusercontent.com/14002654/160038866-573b1439-6bd7-4ea4-aae9-6050b27bd24d.jpg" width="250">
 
 Example Screenshot 3:
 
-<img src="https://user-images.githubusercontent.com/14002654/159149287-79ad81fd-af82-43e6-bb69-a930a679474e.jpg" width="250">
+<img src="https://user-images.githubusercontent.com/14002654/160038926-03ed848b-7d95-48a6-a4d1-f51ae7cd75e3.jpg" width="250">
 
+Example Screenshot 4:
+
+<img src="https://user-images.githubusercontent.com/14002654/160039004-2b72866b-56d5-4805-897f-19186a5d6fa5.jpg" width="250">
 
 ## Features
-* View and scroll through a list of Pokemon in the game. Each Pokemon is depicted with a summary row displaying research progress for that Pokemon. When a Pokemon, has reached research level 10 (minimum 100 research points + 100 bonus points for reaching level 10), a Pokeball will display in their summary row similar to the actual game. A Masterball displays when all research points have been earned for that Pokemon. Examples in screenshot 1.
+* View and scroll through a list of Pokemon in the game. Each Pokemon is depicted with a summary row displaying research progress for that Pokemon. When a Pokemon has reached research level 10 (minimum 100 research points + 100 bonus points for reaching level 10), a Pokeball will display in their summary row similar to the actual game. A Masterball displays when all research points have been earned for that Pokemon. Examples in screenshot 1.
 * View research task list for a Pokemon by tapping on its summary row. (Tapping again hides the list). You can record progress on a research task by tapping the box matching your current progression in that task. You can tap the current progress for a task to clear out all progress for that task.
 * Monitor your research rank in the app's top bar and see how many research points you need to rank up.
 * Sort the Pokemon list by Hisui (PLA region) numbering, National Pokedex numbering or alphabetical name sort. Screenshot 2 shows the options and the list in National sort.
 * Search key words. What you type in will match against a Pokemon name or research task description and case does not matter (so searching "nosepass" would still get you Nosepass). For example, screenshot 3 shows the result of searching "ore deposit" and brings up Pokemon that have the research task for being seen leaping out of ore deposits.
+* Supports English and Japanese. Screenshot 4 shows Japanese Dark Mode.
 
 ## Project Status
-v1.0.0 APK available in releases.
+v1.1.0 APK available in releases.
 
-Basic functionality has been implemented including the main features I set out to have. I have ideas for new features and improvements that I may add as I learn more.
+Japanese language support and Dark Mode support have been added and are automatically enabled when those options are preferred based on device settings. Feedback on Japanese translations is welcome as I had to use online translations for some words.
 
 ## Android Concepts Used
 * Model-View-ViewModel (MVVM) architecture
