@@ -652,7 +652,26 @@ object PokeTranslateData {
         PokeTranslate(oldText = "Points", newText = "ポイント"),
         PokeTranslate(oldText = "Searched for", newText = "検索結果"),
         PokeTranslate(oldText = "Points to next rank:", newText = "次のランクへ"),
-        PokeTranslate(oldText = "Method unknown", newText = "1")
+        PokeTranslate(oldText = "Method unknown", newText = "1"),
+        PokeTranslate(oldText = "BUG", newText = "むし"),
+        PokeTranslate(oldText = "DARK", newText = "あく"),
+        PokeTranslate(oldText = "DRAGON", newText = "ドラゴン"),
+        PokeTranslate(oldText = "ELECTRIC", newText = "でんき"),
+        PokeTranslate(oldText = "FAIRY", newText = "フェアリー"),
+        PokeTranslate(oldText = "FIGHTING", newText = "かくとう"),
+        PokeTranslate(oldText = "FIRE", newText = "ほのお"),
+        PokeTranslate(oldText = "FLYING", newText = "ひこう"),
+        PokeTranslate(oldText = "GHOST", newText = "ゴースト"),
+        PokeTranslate(oldText = "GRASS", newText = "くさ"),
+        PokeTranslate(oldText = "GROUND", newText = "じめん"),
+        PokeTranslate(oldText = "ICE", newText = "こおり"),
+        PokeTranslate(oldText = "NORMAL", newText = "ノーマル"),
+        PokeTranslate(oldText = "POISON", newText = "どく"),
+        PokeTranslate(oldText = "PSYCHIC", newText = "エスパー"),
+        PokeTranslate(oldText = "ROCK", newText = "いわ"),
+        PokeTranslate(oldText = "STEEL", newText = "はがね"),
+        PokeTranslate(oldText = "WATER", newText = "みず"),
+        PokeTranslate(oldText = "-type", newText = "タイプ")
     )
 
     //Supported languages

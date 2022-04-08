@@ -1,6 +1,8 @@
 package jzam.arcedex.utils
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.intl.LocaleList
+import jzam.arcedex.data.PokeMovesData
 import jzam.arcedex.data.PokeResearchData
 import jzam.arcedex.data.PokeTranslateData
 import jzam.arcedex.models.SupportedLanguage
@@ -111,4 +113,21 @@ fun getSupportedLanguage(locales: LocaleList): SupportedLanguage {
         }
     }
     return SupportedLanguage.ENGLISH
+}
+
+fun getMoveType(task: String): String {
+    val moveName = task.replace("Times you’ve seen it use ", "")
+    val move = PokeMovesData.moves.find { it.name == moveName }
+    if (move != null && move.power != "—") {
+        return (move.type)
+    }
+    return ""
+}
+
+fun getTypeColor(type: String): Color {
+    val typeColor = PokeMovesData.typeColors.find { it.type == type}
+    if (typeColor != null) {
+        return typeColor.color
+    }
+    return Color.White
 }

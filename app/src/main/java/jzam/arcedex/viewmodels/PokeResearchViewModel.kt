@@ -136,6 +136,7 @@ class PokeResearchViewModel(
     //Search for given text in research task list. Can match on Pokemon name or description of a
     //task. Set Pokemon list to filtered list.
     fun searchPokedex(searchText: String) {
+        searchClear()
         var idx = 0
         val matchingPokemon: MutableList<Pokemon> = mutableListOf()
         val nameToListIdx: MutableMap<String, Int> = mutableMapOf()

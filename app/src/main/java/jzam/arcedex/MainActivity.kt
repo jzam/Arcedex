@@ -113,7 +113,8 @@ fun ArcedexApp(pokeResearchViewModel: PokeResearchViewModel) {
                     progress = researchProgress!!,
                     pokeSort = pokeSort!!,
                     onGoalClick = pokeResearchViewModel::onGoalClick,
-                    pokemonToResearchTasks = pokemonToResearchTasks
+                    pokemonToResearchTasks = pokemonToResearchTasks,
+                    onMoveClick = pokeResearchViewModel::searchPokedex
                 )
             }
         }
@@ -195,7 +196,8 @@ fun Pokedex(
     language: SupportedLanguage,
     pokedex: List<Pokemon>, progress: List<ResearchProgress>,
     pokeSort: PokeSort, onGoalClick: (PokeResearch, Int) -> Unit,
-    pokemonToResearchTasks: Map<String, MutableList<PokeResearch>>?
+    pokemonToResearchTasks: Map<String, MutableList<PokeResearch>>?,
+    onMoveClick: (String) -> Unit
 ) {
     if (pokedex.isNotEmpty()) {
         LazyColumn {
@@ -206,7 +208,8 @@ fun Pokedex(
                     tasks = pokemonToResearchTasks?.get(it.name),
                     progress = progress,
                     pokeSort = pokeSort,
-                    onGoalClick = onGoalClick
+                    onGoalClick = onGoalClick,
+                    onMoveClick = onMoveClick
                 )
             }
         }
@@ -223,10 +226,17 @@ fun PokedexPokemon(
     tasks: MutableList<PokeResearch>?,
     progress: List<ResearchProgress>,
     pokeSort: PokeSort,
-    onGoalClick: (PokeResearch, Int) -> Unit
+    onGoalClick: (PokeResearch, Int) -> Unit,
+    onMoveClick: (String) -> Unit,
 ) {
 
     var isExpanded by remember { mutableStateOf(false) }
+    var name by remember { mutableStateOf("") }
+
+    if (pokemon.name != name) {
+        isExpanded = false
+        name = pokemon.name
+    }
 
     Row(
         modifier = Modifier
@@ -243,7 +253,7 @@ fun PokedexPokemon(
             if (isExpanded) {
                 if (tasks != null) {
                     for (item in tasks) {
-                        TaskRow(language, item, onGoalClick)
+                        TaskRow(language, item, onGoalClick, onMoveClick)
                     }
                 }
             }
@@ -381,7 +391,8 @@ fun ProgressPokeballImage(pokeProgress: ResearchProgress) {
 fun TaskRow(
     language: SupportedLanguage,
     pokemonTask: PokeResearch,
-    onGoalClick: (PokeResearch, Int) -> Unit
+    onGoalClick: (PokeResearch, Int) -> Unit,
+    onMoveClick: (String) -> Unit
 ) {
 
     Row(
@@ -390,12 +401,7 @@ fun TaskRow(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         PointsIcon(points = pokemonTask.points)
-        Text(
-            //pokemonTask.task, modifier = Modifier
-            translate(language, pokemonTask.task), modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 8.dp)
-        )
+        TaskText(language, pokemonTask.task, onMoveClick)
         GoalText(
             language = language,
             goal = pokemonTask.goal1,
@@ -447,6 +453,38 @@ fun PointsIcon(points: Int) {
         imgId = R.drawable.double_points, size = 25,
         desc = stringResource(id = R.string.points_icon_desc), color = color, alpha = 1f
     )
+}
+
+//Task description that will show move type if it's for a Pokemon move
+@Composable
+fun RowScope.TaskText(language: SupportedLanguage, task: String, onMoveClick: (String) -> Unit) {
+    Column(modifier = Modifier.weight(1f)) {
+        Text(
+            translate(language, task), modifier = Modifier
+                .padding(horizontal = 8.dp)
+        )
+
+        val type = getMoveType(task)
+        val typeText = translate(language, "-type")
+        val translatedType = translate(language, type)
+        if (type.isNotBlank()) {
+            val bgColor = getTypeColor(type)
+            Card(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .border(1.dp, Color.White)
+                    .clickable { onMoveClick(("$translatedType$typeText")) }
+            ) {
+                Text(
+                    text = translate(language, type),
+                    color = MaterialTheme.colors.onPrimary,
+                    modifier = Modifier
+                        .background(bgColor)
+                        .padding(all = 8.dp)
+                )
+            }
+        }
+    }
 }
 
 //Goal description that can clicked to modify goal progress for a research task
