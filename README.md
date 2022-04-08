@@ -17,7 +17,7 @@ Those were the main features I wanted, but I also planned and implemented other 
 ## App Screenshots
 Example Screenshot 1:
 
-<img src="https://user-images.githubusercontent.com/14002654/160038783-cd47687b-5228-47ec-9fa3-86f4c0e0e4b8.jpg" width="250">
+<img src="https://user-images.githubusercontent.com/14002654/162358041-6c4e510b-899e-4901-ad35-3a21188d32fd.jpg" width="250">
 
 Example Screenshot 2:
 
@@ -25,11 +25,16 @@ Example Screenshot 2:
 
 Example Screenshot 3:
 
-<img src="https://user-images.githubusercontent.com/14002654/160038926-03ed848b-7d95-48a6-a4d1-f51ae7cd75e3.jpg" width="250">
+<img src="https://user-images.githubusercontent.com/14002654/162358137-5e3b0ea3-f928-454c-851e-5a0603982585.jpg" width="250">
 
 Example Screenshot 4:
 
-<img src="https://user-images.githubusercontent.com/14002654/160039004-2b72866b-56d5-4805-897f-19186a5d6fa5.jpg" width="250">
+<img src="https://user-images.githubusercontent.com/14002654/162358313-ee1633f4-0fa2-4d40-b33d-ee458b02fd95.jpg" width="250">
+
+Example Screenshot 5:
+
+<img src="https://user-images.githubusercontent.com/14002654/162358256-d6c220a1-7e96-443c-8139-4f7438d2b02d.jpg" width="250">
+
 
 ## Features
 * View and scroll through a list of Pokemon in the game. Each Pokemon is depicted with a summary row displaying research progress for that Pokemon. When a Pokemon has reached research level 10 (minimum 100 research points + 100 bonus points for reaching level 10), a Pokeball will display in their summary row similar to the actual game. A Masterball displays when all research points have been earned for that Pokemon. Examples in screenshot 1.
@@ -38,11 +43,14 @@ Example Screenshot 4:
 * Sort the Pokemon list by Hisui (PLA region) numbering, National Pokedex numbering or alphabetical name sort. Screenshot 2 shows the options and the list in National sort.
 * Search key words. What you type in will match against a Pokemon name or research task description and case does not matter (so searching "nosepass" would still get you Nosepass). For example, screenshot 3 shows the result of searching "ore deposit" and brings up Pokemon that have the research task for being seen leaping out of ore deposits.
 * Supports English and Japanese. Screenshot 4 shows Japanese Dark Mode.
+* Tapping a move-type like "FIRE" in Screenshot 1 will do a quick search of that move type to get a list of Pokemon that have a task to be defeated by that move-type as shown in Screenshot 5.
 
 ## Project Status
-v1.1.0 APK available in releases.
+v1.2.0 APK available in releases. 
 
-Japanese language support and Dark Mode support have been added and are automatically enabled when those options are preferred based on device settings. Feedback on Japanese translations is welcome as I had to use online translations for some words.
+It adds move-type buttons for damage-dealing moves that can be clicked to quickly get a list of Pokemon that have a task to be defeated by that move-type
+
+Feedback on Japanese translations is welcome as I had to use online translations for some words.
 
 ## Android Concepts Used
 * Model-View-ViewModel (MVVM) architecture
